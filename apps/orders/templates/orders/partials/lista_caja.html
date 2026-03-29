@@ -1,0 +1,187 @@
+﻿<div class="row g-3">
+    {% for pedido in pedidos %}
+    <div class="col-12 col-md-6 col-xl-4">
+        <div class="caja-card">
+            <div class="caja-header">
+                <div>
+                    <div class="caja-label">Mesa</div>
+                    <div class="caja-title">#{{ pedido.table.number }}</div>
+                </div>
+                <div class="caja-meta">
+                    <div class="caja-id">Pedido #{{ pedido.id }}</div>
+                    <span class="caja-status">Entregado</span>
+                </div>
+            </div>
+            <div class="caja-body">
+                <ul class="caja-items">
+                    {% for item in pedido.items.all %}
+                    <li>
+                        <span class="item-qty">x{{ item.quantity }}</span>
+                        <span class="item-name">{{ item.menu_item.name }}</span>
+                        <span class="item-price">${{ item.price_at_order }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="caja-footer">
+                <span class="caja-time">Desde {{ pedido.created_at|timesince }}</span>
+                <span class="caja-total">${{ pedido.total_amount }}</span>
+            </div>
+            <div class="caja-actions">
+                <a class="action-btn btn-ticket" href="{% url 'generar_ticket' pedido.id %}" target="_blank">Imprimir cuenta</a>
+                <form class="action-form"
+                      hx-post="{% url 'actualizar_estado_pedido' pedido.id %}"
+                      hx-target="#lista-caja"
+                      hx-swap="innerHTML">
+                    {% csrf_token %}
+                    <input type="hidden" name="status" value="PAID">
+                    <input type="hidden" name="payment_method" value="CASH">
+                    <button class="action-btn btn-cash" type="submit">Pagar Efectivo</button>
+                </form>
+                <form class="action-form"
+                      hx-post="{% url 'actualizar_estado_pedido' pedido.id %}"
+                      hx-target="#lista-caja"
+                      hx-swap="innerHTML">
+                    {% csrf_token %}
+                    <input type="hidden" name="status" value="PAID">
+                    <input type="hidden" name="payment_method" value="CARD">
+                    <button class="action-btn btn-card" type="submit">Pagar Tarjeta</button>
+                </form>
+                <form class="action-form"
+                      hx-post="{% url 'actualizar_estado_pedido' pedido.id %}"
+                      hx-target="#lista-caja"
+                      hx-swap="innerHTML">
+                    {% csrf_token %}
+                    <input type="hidden" name="status" value="CANCELLED">
+                    <button class="action-btn btn-cancel" type="submit">Cancelar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center">
+        <div class="empty-state">
+            <div class="empty-title">No hay cuentas pendientes</div>
+            <div class="empty-subtitle">Todos los pedidos ya estan cobrados.</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+    .caja-card {
+        background: rgba(23, 30, 39, 0.95);
+        border: 1px solid #26313d;
+        border-radius: 16px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        box-shadow: 0 10px 24px rgba(0,0,0,0.3);
+    }
+    .caja-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .caja-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #9aa7b4;
+    }
+    .caja-title {
+        font-size: 22px;
+        font-weight: 700;
+    }
+    .caja-meta {
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .caja-id { font-size: 13px; color: #b4b6c2; }
+    .caja-status {
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        background: rgba(41, 211, 145, 0.2);
+        color: #29d391;
+    }
+    .caja-items {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .caja-items li {
+        display: grid;
+        grid-template-columns: 48px 1fr auto;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+    }
+    .item-qty {
+        display: inline-block;
+        min-width: 32px;
+        text-align: center;
+        border-radius: 10px;
+        padding: 2px 6px;
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        font-weight: 600;
+    }
+    .item-price {
+        color: #ffd166;
+        font-weight: 700;
+    }
+    .caja-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid #26313d;
+        padding-top: 10px;
+        font-size: 13px;
+        color: #b4b6c2;
+    }
+    .caja-total { font-size: 14px; font-weight: 700; color: #29d391; }
+    .caja-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .action-form { margin: 0; }
+    .action-btn {
+        border: none;
+        border-radius: 10px;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        color: #0b0b0f;
+        background: #cbd5e1;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-ticket { background: #f4a261; }
+    .btn-cash { background: #00b4d8; }
+    .btn-card { background: #9b5de5; color: #fff; }
+    .btn-cancel { background: #ff5a3d; color: #fff; }
+    .empty-state {
+        border: 1px dashed #2b2a38;
+        border-radius: 16px;
+        padding: 32px;
+        background: rgba(21, 20, 27, 0.6);
+    }
+    .empty-title { font-size: 20px; font-weight: 700; }
+    .empty-subtitle { color: #9aa7b4; }
+</style>

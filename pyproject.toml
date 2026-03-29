@@ -1,0 +1,13 @@
+[project]
+name = "cursodjango"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pytest>=8.0.0",
+    "pytest-django>=4.8.0",
+    "django>=6.0.3",
+    "pillow>=12.1.1",
+    "reportlab>=4.4.10",
+]

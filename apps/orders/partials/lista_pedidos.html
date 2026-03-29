@@ -1,0 +1,236 @@
+﻿<div class="row g-3">
+    {% for pedido in pedidos %}
+    <div class="col-12 col-md-6 col-xl-4">
+        <div class="pedido-card" data-order-id="{{ pedido.id }}">
+            <div class="pedido-header">
+                <div>
+                    <div class="pedido-label">Mesa</div>
+                    <div class="pedido-title">#{{ pedido.table.number }}</div>
+                </div>
+                <div class="pedido-meta">
+                    <div class="pedido-id">Pedido #{{ pedido.id }}</div>
+                    {% if pedido.status == "PENDING" %}
+                        <span class="pedido-status status-pending">Pendiente</span>
+                    {% elif pedido.status == "PREPARING" %}
+                        <span class="pedido-status status-preparing">En cocina</span>
+                    {% else %}
+                        <span class="pedido-status status-delivered">En caja</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="pedido-body">
+                <div class="pedido-items-title">Items</div>
+                <ul class="pedido-items">
+                    {% for item in pedido.items.all %}
+                    <li>
+                        <span class="item-qty">x{{ item.quantity }}</span>
+                        <span class="item-name">{{ item.menu_item.name }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="pedido-footer">
+                <span class="pedido-time">Desde {{ pedido.created_at|timesince }}</span>
+                <span class="pedido-total">${{ pedido.total_amount }}</span>
+            </div>
+
+            <div class="pedido-actions">
+                {% if pedido.status == "PENDING" %}
+                    <form class="action-form"
+                          hx-post="{% url 'actualizar_estado_pedido' pedido.id %}"
+                          hx-target="#lista-pedidos"
+                          hx-swap="innerHTML">
+                        {% csrf_token %}
+                        <input type="hidden" name="status" value="PREPARING">
+                        <button class="action-btn btn-preparing" type="submit">Enviar a cocina</button>
+                    </form>
+                    <form class="action-form"
+                          hx-post="{% url 'actualizar_estado_pedido' pedido.id %}"
+                          hx-target="#lista-pedidos"
+                          hx-swap="innerHTML">
+                        {% csrf_token %}
+                        <input type="hidden" name="status" value="CANCELLED">
+                        <button class="action-btn btn-cancel" type="submit">Cancelar</button>
+                    </form>
+                {% elif pedido.status == "PREPARING" %}
+                    <form class="action-form"
+                          hx-post="{% url 'actualizar_estado_pedido' pedido.id %}"
+                          hx-target="#lista-pedidos"
+                          hx-swap="innerHTML">
+                        {% csrf_token %}
+                        <input type="hidden" name="status" value="DELIVERED">
+                        <button class="action-btn btn-delivered" type="submit">Enviar a caja</button>
+                    </form>
+                    <form class="action-form"
+                          hx-post="{% url 'actualizar_estado_pedido' pedido.id %}"
+                          hx-target="#lista-pedidos"
+                          hx-swap="innerHTML">
+                        {% csrf_token %}
+                        <input type="hidden" name="status" value="CANCELLED">
+                        <button class="action-btn btn-cancel" type="submit">Cancelar</button>
+                    </form>
+                {% elif pedido.status == "DELIVERED" %}
+                    <div class="envio-caja">
+                        Envio exitoso
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center">
+        <div class="empty-state">
+            <div class="empty-title">Cocina limpia</div>
+            <div class="empty-subtitle">No hay pedidos pendientes.</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+    .pedido-card {
+        background: rgba(21, 20, 27, 0.9);
+        border: 1px solid #242330;
+        border-radius: 16px;
+        padding: 16px;
+        min-height: 240px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        box-shadow: 0 10px 24px rgba(0,0,0,0.3);
+    }
+    .pedido-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .pedido-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #9aa0b4;
+    }
+    .pedido-title {
+        font-size: 22px;
+        font-weight: 700;
+    }
+    .pedido-meta {
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .pedido-id {
+        font-size: 13px;
+        color: #b4b6c2;
+    }
+    .pedido-status {
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+    }
+    .status-pending { background: rgba(255, 90, 61, 0.2); color: #ff5a3d; }
+    .status-preparing { background: rgba(255, 209, 102, 0.2); color: #ffd166; }
+    .status-delivered { background: rgba(41, 211, 145, 0.2); color: #29d391; }
+    .pedido-body {
+        flex: 1;
+    }
+    .pedido-items-title {
+        font-size: 12px;
+        color: #9aa0b4;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+    }
+    .pedido-items {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .pedido-items li {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+    }
+    .item-qty {
+        display: inline-block;
+        min-width: 32px;
+        text-align: center;
+        border-radius: 10px;
+        padding: 2px 6px;
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        font-weight: 600;
+    }
+    .pedido-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid #242330;
+        padding-top: 10px;
+        font-size: 13px;
+        color: #b4b6c2;
+    }
+    .pedido-total {
+        font-size: 14px;
+        font-weight: 700;
+        color: #29d391;
+    }
+    .pedido-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 6px;
+    }
+    .envio-caja {
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: rgba(41, 211, 145, 0.15);
+        color: #29d391;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        text-align: center;
+    }
+    .action-form {
+        margin: 0;
+    }
+    .action-btn {
+        border: none;
+        border-radius: 10px;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        color: #0b0b0f;
+    }
+    .btn-preparing { background: #ffd166; }
+    .btn-delivered { background: #29d391; }
+    .btn-cash { background: #00b4d8; }
+    .btn-card { background: #9b5de5; }
+    .btn-cancel { background: #ff5a3d; color: #fff; }
+    .empty-state {
+        border: 1px dashed #2b2a38;
+        border-radius: 16px;
+        padding: 32px;
+        background: rgba(21, 20, 27, 0.6);
+    }
+    .empty-title {
+        font-size: 20px;
+        font-weight: 700;
+    }
+    .empty-subtitle {
+        color: #9aa0b4;
+    }
+</style>
