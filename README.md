@@ -96,8 +96,8 @@ uv run python manage.py migrate
 
 Si `uv` falla:
 ```
-C:\Dev\CursoDjango\.venv\Scripts\python.exe manage.py makemigrations
-C:\Dev\CursoDjango\.venv\Scripts\python.exe manage.py migrate
+C:\Tu_ruta\.venv\Scripts\python.exe manage.py makemigrations
+C:\Tu_ruta\.venv\Scripts\python.exe manage.py migrate
 ```
 
 ## Permisos
