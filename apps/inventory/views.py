@@ -1,6 +1,6 @@
 import csv
 
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 from django.db import transaction
 from django.http import HttpResponse
 from django.db.models import F, Sum
@@ -21,9 +21,11 @@ def menu_digital(request):
 def _can_manage_stock(user):
     if user.is_superuser:
         return True
-    if user.groups.filter(name="Admins").exists():
+    if user.groups.filter(name__iexact="Admins").exists():
         return True
-    if user.groups.filter(name="Cocina").exists():
+    if user.groups.filter(name__iexact="Cocina").exists():
+        return True
+    if user.groups.filter(name__iexact="COCINA").exists():
         return True
     return user.has_perm("inventory.change_menuitem")
 

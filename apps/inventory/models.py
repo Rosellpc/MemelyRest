@@ -34,7 +34,9 @@ class MenuItem(models.Model):
 
 class StockAdjustment(models.Model):
     menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
-    user = models.ForeignKey("auth.User", on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(
+        "users.CustomUser", on_delete=models.SET_NULL, null=True, blank=True
+    )
     previous_stock = models.PositiveIntegerField()
     new_stock = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)

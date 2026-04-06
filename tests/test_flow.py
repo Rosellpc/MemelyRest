@@ -8,10 +8,12 @@ from apps.orders.models import Order, OrderItem, Table
 
 @pytest.mark.django_db
 def test_flow_pos_cocina_caja(client, django_user_model):
-    user = django_user_model.objects.create_user(username="mesero", password="pass123")
+    waiter = django_user_model.objects.create_user(username="mesero", password="pass123")
+    waiter_group, _ = Group.objects.get_or_create(name="WAITER")
+    waiter.groups.add(waiter_group)
     perm = Permission.objects.get(codename="add_order")
-    user.user_permissions.add(perm)
-    client.force_login(user)
+    waiter.user_permissions.add(perm)
+    client.force_login(waiter)
 
     category = Category.objects.create(name="Bebidas")
     item = MenuItem.objects.create(
@@ -36,6 +38,8 @@ def test_flow_pos_cocina_caja(client, django_user_model):
     table.refresh_from_db()
     assert table.is_occupied is True
 
+    admin = django_user_model.objects.create_superuser(username="admin", password="pass123")
+    client.force_login(admin)
     url_estado = reverse("actualizar_estado_pedido", args=[order.id])
     resp = client.post(url_estado, {"status": Order.STATUS_DELIVERED})
     assert resp.status_code == 200
@@ -59,7 +63,7 @@ def test_flow_pos_cocina_caja(client, django_user_model):
 @pytest.mark.django_db
 def test_stock_permission_by_role(client, django_user_model):
     user = django_user_model.objects.create_user(username="cocina", password="pass123")
-    cocina_group, _ = Group.objects.get_or_create(name="Cocina")
+    cocina_group, _ = Group.objects.get_or_create(name="COCINA")
     user.groups.add(cocina_group)
 
     client.force_login(user)
@@ -69,7 +73,9 @@ def test_stock_permission_by_role(client, django_user_model):
 
 
 @pytest.mark.django_db
-def test_ticket_pdf_generates(client):
+def test_ticket_pdf_generates(client, django_user_model):
+    admin = django_user_model.objects.create_superuser(username="admin2", password="pass123")
+    client.force_login(admin)
     category = Category.objects.create(name="Platos")
     item = MenuItem.objects.create(
         category=category,

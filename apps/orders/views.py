@@ -1,4 +1,4 @@
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.db import transaction
@@ -13,6 +13,15 @@ from reportlab.graphics.shapes import Drawing
 
 from apps.inventory.models import Category, MenuItem
 from .models import Order, OrderItem, Table
+
+
+def _not_in_groups(*group_names):
+    def check(user):
+        if user.is_superuser:
+            return True
+        return not user.groups.filter(name__in=group_names).exists()
+
+    return check
 
 
 @login_required  # Obliga a estar logueado
@@ -129,17 +138,26 @@ def toma_de_pedidos(request):
     )
 
 
+@login_required
+@user_passes_test(_not_in_groups("WAITER", "CUSTOMER"), login_url=None)
+@permission_required("orders.view_order", raise_exception=True)
 def monitor_cocina(request):
     pedidos_activos = _pedidos_activos()
     return render(request, "orders/cocina.html", {"pedidos": pedidos_activos})
 
 
+@login_required
+@user_passes_test(_not_in_groups("WAITER", "CUSTOMER"), login_url=None)
+@permission_required("orders.view_order", raise_exception=True)
 def lista_pedidos_fragmento(request):
     # Esta vista solo devuelve el pedazo de HTML de la lista
     pedidos = _pedidos_activos()
     return render(request, "orders/partials/lista_pedidos.html", {"pedidos": pedidos})
 
 
+@login_required
+@user_passes_test(_not_in_groups("WAITER", "CUSTOMER"), login_url=None)
+@permission_required("orders.change_order", raise_exception=True)
 @require_POST
 def actualizar_estado_pedido(request, order_id):
     order = get_object_or_404(Order, id=order_id)
@@ -181,16 +199,25 @@ def actualizar_estado_pedido(request, order_id):
 
 
 
+@login_required
+@user_passes_test(_not_in_groups("WAITER", "CUSTOMER"), login_url=None)
+@permission_required("orders.view_order", raise_exception=True)
 def caja(request):
     pedidos = _pedidos_caja()
     return render(request, "orders/caja.html", {"pedidos": pedidos})
 
 
+@login_required
+@user_passes_test(_not_in_groups("WAITER", "CUSTOMER"), login_url=None)
+@permission_required("orders.view_order", raise_exception=True)
 def lista_caja_fragmento(request):
     pedidos = _pedidos_caja()
     return render(request, "orders/partials/lista_caja.html", {"pedidos": pedidos})
 
 
+@login_required
+@user_passes_test(_not_in_groups("WAITER", "CUSTOMER"), login_url=None)
+@permission_required("orders.view_order", raise_exception=True)
 def generar_ticket_pdf(request, order_id):
     order = get_object_or_404(Order, id=order_id)
 
