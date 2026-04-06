@@ -101,7 +101,7 @@ def toma_de_pedidos(request):
         try:
             with transaction.atomic():
                 order = Order.objects.create(
-                    table=table, status=Order.STATUS_PREPARING
+                    table=table, status=Order.STATUS_PREPARING, created_by=request.user
                 )
                 table.is_occupied = True
                 table.save()
@@ -258,6 +258,12 @@ def generar_ticket_pdf(request, order_id):
     p.drawString(left, y, f"Pedido #: {order.id}")
     mesa = order.table.number if order.table_id else "-"
     p.drawRightString(right, y, f"Mesa: {mesa} | Estado: {order.get_status_display()}")
+    y -= 14
+    p.setFont("Helvetica", 10)
+    if order.created_by:
+        p.drawString(left, y, f"Mozo: {order.created_by.username}")
+    else:
+        p.drawString(left, y, "Mozo: -")
 
     y -= 18
     p.line(left, y, right, y)
@@ -337,7 +343,7 @@ def _pedidos_activos():
                 Order.STATUS_DELIVERED,
             ]
         )
-        .select_related("table")
+        .select_related("table", "created_by")
         .prefetch_related("items", "items__menu_item")
         .order_by("created_at")
     )
@@ -346,7 +352,7 @@ def _pedidos_activos():
 def _pedidos_caja():
     return (
         Order.objects.filter(status=Order.STATUS_DELIVERED)
-        .select_related("table")
+        .select_related("table", "created_by")
         .prefetch_related("items", "items__menu_item")
         .order_by("created_at")
     )

@@ -2,10 +2,10 @@
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import Group
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
-from django.urls import reverse
-from .forms import CustomUserCreationForm
+
+from .forms import CustomUserCreationForm, ProfileForm
 
 
 class RoleBasedLoginView(LoginView):
@@ -59,6 +59,20 @@ def register(request):
         form = CustomUserCreationForm()
 
     return render(request, "users/register.html", {"form": form})
+
+
+@login_required
+def profile(request):
+    if request.method == "POST":
+        form = ProfileForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Avatar actualizado.")
+            return redirect("profile")
+    else:
+        form = ProfileForm(instance=request.user)
+
+    return render(request, "users/profile.html", {"form": form})
 
 
 

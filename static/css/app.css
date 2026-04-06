@@ -642,6 +642,12 @@ textarea:focus-visible {
     font-weight: 700;
 }
 
+.cocina-page .pedido-meta-user {
+    font-size: 12px;
+    color: #c3cad6;
+    margin-top: 4px;
+}
+
 .cocina-page .pedido-meta {
     text-align: right;
     display: flex;
@@ -810,4 +816,229 @@ textarea:focus-visible {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+.avatar-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    text-decoration: none;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.avatar-fallback {
+    width: 100%;
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+    color: #111827;
+    background: #e2e8f0;
+}
+
+.theme-dark .avatar-fallback {
+    background: #f5f7fb;
+    color: #111827;
+}
+
+.profile-page .profile-shell {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.profile-page .profile-card,
+.profile-page .profile-panel {
+    background: rgba(31, 35, 46, 0.95);
+    border: 1px solid #2c3342;
+    border-radius: 18px;
+    padding: 20px;
+}
+
+.profile-page .profile-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.profile-page .profile-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-page .profile-avatar .avatar-img,
+.profile-page .profile-avatar .avatar-fallback {
+    width: 100%;
+    height: 100%;
+    font-size: 18px;
+}
+
+.profile-page .profile-name {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.profile-page .profile-role {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #cdd3df;
+    margin-top: 4px;
+}
+
+.profile-page .profile-hint {
+    font-size: 13px;
+    color: #aab3c2;
+    margin-top: 8px;
+}
+
+.profile-page .profile-form input[type="file"] {
+    display: block;
+    width: 100%;
+    padding: 8px 10px;
+    background: #0f1217;
+    border: 1px solid #2c3342;
+    border-radius: 10px;
+    color: #f6f7fb;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-user {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.header-username {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.header-role {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #cdd3df;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-right form {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .header-actions {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+    }
+}
+
+.dashboard-page .card {
+    background: rgba(31, 35, 46, 0.95);
+    border: 1px solid #2c3342;
+    border-radius: 16px;
+}
+
+.dashboard-page .card h5 { color: #ffffff; }
+
+.dashboard-page .card p { color: #cdd3df; }
+
+.dashboard-page .btn-outline-light {
+    color: #f6f7fb;
+    border-color: #7f8aa3;
+}
+
+.dashboard-page a { text-decoration: none; }
+
+.dashboard-page .card {
+    background: rgba(18, 22, 29, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    box-shadow: none;
+}
+
+.dashboard-page .card h5 {
+    color: #e6ebf5;
+}
+
+.dashboard-page .card p {
+    color: #9aa3b2;
+}
+
+.dashboard-page .btn-outline-light {
+    color: #dfe6f2;
+    border-color: rgba(223, 230, 242, 0.35);
+    background: transparent;
+}
+
+.dashboard-page .btn-outline-light:hover {
+    background: rgba(223, 230, 242, 0.12);
+    border-color: rgba(223, 230, 242, 0.6);
+}
+
+.dashboard-page .btn-outline-light:focus-visible {
+    box-shadow: 0 0 0 2px rgba(223, 230, 242, 0.25);
+}
+
+.dashboard-page .card {
+    background: #ebe9e9 !important;
+    color: #111827;
+    border: 1px solid #e5e7eb;
+}
+
+.dashboard-page .card h5 {
+    color: #111827 !important;
+}
+
+.dashboard-page .card p,
+.dashboard-page .card .text-muted {
+    color: #6b7280 !important;
+}
+
+.dashboard-page .card .btn-outline-light {
+    background: rgb(71, 71, 84);
+    color: #ffffff;
+    border-color: #d1d5db;
+}
+
+.dashboard-page .card .btn-outline-light:hover {
+    background: #111827;
+    color: #ffffff;
+    border-color: #111827;
 }

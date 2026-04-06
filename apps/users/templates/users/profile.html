@@ -1,0 +1,50 @@
+﻿{% extends 'base.html' %}
+{% load user_groups %}
+
+{% block title %}Perfil - memelyAI{% endblock %}
+
+{% block body_class %}theme-dark profile-page{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="profile-shell">
+        <div class="profile-card">
+            <div class="profile-avatar">
+                {% if request.user.avatar %}
+                    <img class="avatar-img" src="{{ request.user.avatar.url }}" alt="Avatar de {{ request.user.username }}">
+                {% else %}
+                    <div class="avatar-fallback">{{ request.user|user_initials }}</div>
+                {% endif %}
+            </div>
+            <div class="profile-meta">
+                <div class="profile-name">@{{ request.user.username }}</div>
+                <div class="profile-role">
+                    {% if request.user.is_superuser %}
+                        ADMIN
+                    {% else %}
+                        {% for g in request.user.groups.all %}{{ g.name }}{% if not forloop.last %} · {% endif %}{% empty %}Sin rol{% endfor %}
+                    {% endif %}
+                </div>
+                <div class="profile-hint">Actualiza tu foto para personalizar tu cuenta.</div>
+            </div>
+        </div>
+
+        <div class="profile-panel">
+            <h5 class="mb-3">Actualizar avatar</h5>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-success">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            <form method="post" enctype="multipart/form-data" class="profile-form">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Sube una foto (PNG o JPG)</label>
+                    {{ form.avatar }}
+                </div>
+                <button type="submit" class="btn btn-primary">Guardar avatar</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

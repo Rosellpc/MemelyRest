@@ -6,6 +6,7 @@ from .views import (
     admin_dashboard,
     home,
     register,
+    profile,
 )
 
 urlpatterns = [
@@ -14,4 +15,5 @@ urlpatterns = [
     path("logout/", role_based_logout, name="logout"),
     path("register/", register, name="register"),
     path("dashboard/", admin_dashboard, name="admin_dashboard"),
+    path("perfil/", profile, name="profile"),
 ]

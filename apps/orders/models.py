@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import F, Sum
@@ -37,6 +38,13 @@ class Order(models.Model):
     ]
 
     table = models.ForeignKey(Table, on_delete=models.SET_NULL, null=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="orders",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
         max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING
@@ -67,7 +75,10 @@ class OrderItem(models.Model):
         if self.menu_item_id:
             if not self.menu_item.is_available:
                 errors["menu_item"] = "El plato no esta disponible."
-            if self.menu_item.stock is not None and self.menu_item.stock < self.quantity:
+            if (
+                self.menu_item.stock is not None
+                and self.menu_item.stock < self.quantity
+            ):
                 errors["quantity"] = "Stock insuficiente para este plato."
             if self.menu_item.price is not None and self.menu_item.price <= 0:
                 errors["menu_item"] = "El plato debe tener un precio valido."

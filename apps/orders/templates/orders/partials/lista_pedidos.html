@@ -6,6 +6,9 @@
                 <div>
                     <div class="pedido-label">Mesa</div>
                     <div class="pedido-title">#{{ pedido.table.number }}</div>
+                    {% if pedido.created_by %}
+                        <div class="pedido-meta-user">Responsable: @{{ pedido.created_by.username }}</div>
+                    {% endif %}
                 </div>
                 <div class="pedido-meta">
                     <div class="pedido-id">Pedido #{{ pedido.id }}</div>
