@@ -1,17 +1,22 @@
-from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
-from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.contrib.auth.decorators import (
+    login_required,
+    permission_required,
+    user_passes_test,
+)
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
-from reportlab.pdfgen import canvas
-from reportlab.graphics.barcode import qr
 from reportlab.graphics import renderPDF
+from reportlab.graphics.barcode import qr
 from reportlab.graphics.shapes import Drawing
+from reportlab.pdfgen import canvas
 
 from apps.inventory.models import Category, MenuItem
+
 from .models import Order, OrderItem, Table
 
 
@@ -109,7 +114,7 @@ def toma_de_pedidos(request):
                     OrderItem.objects.create(
                         order=order, menu_item=menu_items[menu_id], quantity=qty
                     )
-        except ValidationError as exc:
+        except ValidationError:
             return render(
                 request,
                 "orders/pos.html",
@@ -195,8 +200,6 @@ def actualizar_estado_pedido(request, order_id):
 
     pedidos = _pedidos_activos()
     return render(request, "orders/partials/lista_pedidos.html", {"pedidos": pedidos})
-
-
 
 
 @login_required
@@ -305,7 +308,9 @@ def generar_ticket_pdf(request, order_id):
     if order.payment_method:
         p.drawString(left, y, f"Metodo de pago: {order.get_payment_method_display()}")
         if order.paid_at:
-            p.drawRightString(right, y, f"Pagado: {order.paid_at.strftime('%d/%m/%Y %H:%M')}")
+            p.drawRightString(
+                right, y, f"Pagado: {order.paid_at.strftime('%d/%m/%Y %H:%M')}"
+            )
     else:
         p.drawString(left, y, "Metodo de pago: Pendiente")
 

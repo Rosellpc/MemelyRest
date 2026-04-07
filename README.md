@@ -5,16 +5,20 @@ Proyecto Django para gestionar el flujo completo de un restaurante: toma de pedi
 ## Características principales
 
 - **POS (Camarero):** crea pedidos por mesa y envía a cocina automáticamente.
-- **Cocina:** monitor en tiempo real con HTMX, notificaciones y control de stock diario.
+- **Cocina:** monitor en tiempo real con HTMX, notificaciones y responsable del pedido.
 - **Caja:** panel dedicado para cobros y emisión de tickets.
 - **Inventario:** stock diario, stock restante, alertas de bajo stock y reporte CSV.
-- **Tickets PDF:** diseño profesional con datos de empresa y QR opcional.
-- **Roles y permisos:** acceso restringido por grupos (Cocina, Admins, etc.).
-- **Tests:** unit tests con pytest + pytest-django.
+- **Menú público / Cliente:** menú visual con modo cliente.
+- **Perfil de usuario:** avatar, username y rol visibles en la interfaz.
+- **Tickets PDF:** diseño profesional con datos de empresa, QR opcional y nombre del mozo.
+- **Roles y permisos:** acceso restringido por grupos (Cocina, Caja, Admin, etc.).
+- **Tests:** unit tests con `pytest` y tests Django con `manage.py test`.
 
 ## Rutas principales
 
 - `http://127.0.0.1:8000/login/` – Login
+- `http://127.0.0.1:8000/dashboard/` – Dashboard (Admin)
+- `http://127.0.0.1:8000/perfil/` – Perfil de usuario (avatar)
 - `http://127.0.0.1:8000/pos/` – Toma de pedidos (camarero)
 - `http://127.0.0.1:8000/cocina/` – Monitor de cocina
 - `http://127.0.0.1:8000/caja/` – Caja (cobros)
@@ -39,6 +43,12 @@ Proyecto Django para gestionar el flujo completo de un restaurante: toma de pedi
   - Confirmar **stock final del turno**
   - Descargar **reporte CSV**
 
+## Responsable del pedido
+
+- Cada `Order` guarda el usuario que creó el pedido (`created_by`).
+- En cocina se muestra el **responsable** del pedido.
+- En el ticket PDF se imprime el **nombre del mozo**.
+
 ## Reportes
 
 Desde `cocina/stock/` puedes descargar un CSV con:
@@ -58,6 +68,7 @@ El ticket incluye:
 - Total y método de pago
 - Política de devolución
 - QR opcional
+- Mozo a cargo (si existe)
 
 Configurable en `MyWeb/settings.py`:
 ```
@@ -75,15 +86,16 @@ Para incluir logo, coloca el archivo en:
 media/logo.png
 ```
 
-## Tests con pytest
+## Tests
 
-Instalado:
-- `pytest`
-- `pytest-django`
-
-Ejecutar tests:
+### Pytest
 ```
 uv run pytest
+```
+
+### Django test runner
+```
+uv run python manage.py test
 ```
 
 ## Migraciones
@@ -92,6 +104,11 @@ Cada vez que agregues campos o modelos:
 ```
 uv run python manage.py makemigrations
 uv run python manage.py migrate
+```
+
+Si hay conflictos de migración (branches), ejecuta:
+```
+uv run python manage.py makemigrations --merge
 ```
 
 Si `uv` falla:
@@ -103,6 +120,7 @@ C:\Tu_ruta\.venv\Scripts\python.exe manage.py migrate
 ## Permisos
 
 - POS requiere permiso `orders.add_order`
+- Cocina/Caja requieren `orders.view_order` y `orders.change_order` según el flujo
 - Stock diario requiere grupo **Cocina**, **Admins** o superusuario
 
 ## Requisitos
@@ -128,6 +146,10 @@ Agrega imágenes en `docs/screenshots/` y enlázalas aquí:
   - `docs/screenshots/caja.png`
 - Stock
   - `docs/screenshots/stock.png`
+- Dashboard
+  - `docs/screenshots/dashboard.png`
+- Perfil
+  - `docs/screenshots/perfil.png`
 
 ## Roadmap
 
@@ -136,6 +158,7 @@ Agrega imágenes en `docs/screenshots/` y enlázalas aquí:
 - Exportación a Excel (XLSX)
 - WebSockets para actualizaciones en tiempo real
 - Módulo de reservas
+- Interfaz de cliente con pagos (dark kitchen)
 
 ## Tabla de features por rol
 

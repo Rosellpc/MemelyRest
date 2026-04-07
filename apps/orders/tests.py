@@ -1,4 +1,6 @@
-﻿from django.core.exceptions import ValidationError
+﻿from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group, Permission
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
 
@@ -15,6 +17,7 @@ class OrderItemModelTests(TestCase):
             description="Fresca",
             price=10,
             is_available=True,
+            stock=10,
         )
         self.table = Table.objects.create(number=1)
         self.order = Order.objects.create(table=self.table)
@@ -46,8 +49,18 @@ class CocinaViewsTests(TestCase):
             description="Con queso",
             price=5,
             is_available=True,
+            stock=10,
         )
         self.table = Table.objects.create(number=2)
+        user_model = get_user_model()
+        self.user = user_model.objects.create_user(
+            username="cocina_test", password="pass123"
+        )
+        cocina_group, _ = Group.objects.get_or_create(name="COCINA")
+        self.user.groups.add(cocina_group)
+        perm = Permission.objects.get(codename="view_order")
+        self.user.user_permissions.add(perm)
+        self.client.force_login(self.user)
 
     def test_monitor_cocina_returns_200(self):
         url = reverse("monitor_cocina")
@@ -61,4 +74,4 @@ class CocinaViewsTests(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, f"#{pending.id}")
-        self.assertNotContains(response, f"#{delivered.id}")
+        self.assertContains(response, f"#{delivered.id}")

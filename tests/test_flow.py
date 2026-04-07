@@ -32,6 +32,7 @@ def test_flow_pos_cocina_caja(client, django_user_model):
 
     order = Order.objects.latest("id")
     assert order.status == Order.STATUS_PREPARING
+    assert order.created_by == waiter
 
     item.refresh_from_db()
     assert item.stock == 8
@@ -86,7 +87,7 @@ def test_ticket_pdf_generates(client, django_user_model):
         stock=10,
     )
     table = Table.objects.create(number=5)
-    order = Order.objects.create(table=table)
+    order = Order.objects.create(table=table, created_by=admin)
     OrderItem.objects.create(order=order, menu_item=item, quantity=1)
 
     url = reverse("generar_ticket", args=[order.id])
