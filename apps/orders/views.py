@@ -329,6 +329,8 @@ def generar_ticket_pdf(request, order_id):
         width = bounds[2] - bounds[0]
         height = bounds[3] - bounds[1]
         d = Drawing(size, size)
+        # Escala el QR para que encaje en el cuadro fijo
+        widget.scale(size / width, size / height)
         d.add(widget)
         renderPDF.draw(d, p, right - size, 90)
     except Exception:
